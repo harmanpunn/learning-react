@@ -10,3 +10,19 @@ export function getMovies() {
 export function deleteMovie(movieId) {
   return http.delete(apiUrl + "/" + movieId);
 }
+
+export function getMovie(movieId) {
+  return http.get(apiUrl + "/" + movieId);
+}
+
+export function saveMovie(movie) {
+  const { title, numberInStock, dailyRentalRate, genreId } = movie;
+  const movieData = {
+    title: movie.title,
+    numberInStock: movie.numberInStock,
+    dailyRentalRate: movie.dailyRentalRate,
+    genreId: movie.genreId
+  };
+  console.log(movie);
+  return http.put(apiUrl + "/" + movie._id, movieData);
+}
