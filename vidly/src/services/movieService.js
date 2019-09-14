@@ -16,13 +16,13 @@ export function getMovie(movieId) {
 }
 
 export function saveMovie(movie) {
+  console.log(movie);
   const { title, numberInStock, dailyRentalRate, genreId } = movie;
   const movieData = {
-    title: movie.title,
-    numberInStock: movie.numberInStock,
-    dailyRentalRate: movie.dailyRentalRate,
-    genreId: movie.genreId
+    title: title,
+    numberInStock: numberInStock,
+    dailyRentalRate: dailyRentalRate,
+    genreId: genreId
   };
-  console.log(movie);
   return http.put(apiUrl + "/" + movie._id, movieData);
 }
