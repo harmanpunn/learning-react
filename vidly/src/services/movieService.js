@@ -3,26 +3,28 @@ import { apiEndpoint } from "../config.json";
 
 const apiUrl = apiEndpoint + "movies";
 
+function movieUrl(id) {
+  return `${apiUrl}/${id}`;
+}
+
 export function getMovies() {
   return http.get(apiUrl);
 }
 
 export function deleteMovie(movieId) {
-  return http.delete(apiUrl + "/" + movieId);
+  return http.delete(movieUrl(movieId));
 }
 
 export function getMovie(movieId) {
-  return http.get(apiUrl + "/" + movieId);
+  return http.get(movieUrl(movieId));
 }
 
 export function saveMovie(movie) {
-  console.log(movie);
-  const { title, numberInStock, dailyRentalRate, genreId } = movie;
-  const movieData = {
-    title: title,
-    numberInStock: numberInStock,
-    dailyRentalRate: dailyRentalRate,
-    genreId: genreId
-  };
-  return http.put(apiUrl + "/" + movie._id, movieData);
+  if (movie._id) {
+    const movieData = { ...movie };
+    delete movieData._id;
+    return http.put(movieUrl(movie._id), movieData);
+  }
+
+  return http.post(apiUrl, movie);
 }

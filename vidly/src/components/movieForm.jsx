@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import Form from "./common/form";
 import Joi from "joi-browser";
 //import { getGenres } from "../services/fakeGenreService";
-import { getGenres } from "../services/genreService";
 //import { getMovie, saveMovie } from "./../services/fakeMovieService";
+import { getGenres } from "../services/genreService";
 import { getMovie, saveMovie } from "./../services/movieService";
 import { toast } from "react-toastify";
 
@@ -34,21 +34,30 @@ class MovieForm extends Form {
       .label("Daily Rental Rate")
   };
 
-  async componentDidMount() {
+  async populateGenres() {
     const { data: genres } = await getGenres();
     this.setState({ genres });
+  }
 
-    const movieId = this.props.match.params.id;
-    if (movieId === "new") return;
+  async populateMovie() {
+    try {
+      const movieId = this.props.match.params.id;
+      if (movieId === "new") return;
 
-    const { data: movie } = await getMovie(movieId);
-    if (!movie) return this.props.history.replace("/not-found");
+      const { data: movie } = await getMovie(movieId);
+      this.setState({ data: this.mapToViewModel(movie) });
+    } catch (ex) {
+      if (ex.response && ex.response.status === 404)
+        this.props.history.replace("/not-found");
+    }
+  }
 
-    this.setState({ data: this.mapToViewModel(movie) });
+  async componentDidMount() {
+    await this.populateGenres();
+    await this.populateMovie();
   }
 
   mapToViewModel(movie) {
-    console.log(movie);
     return {
       _id: movie._id,
       title: movie.title,
@@ -59,14 +68,8 @@ class MovieForm extends Form {
   }
 
   doSubmit = async () => {
-    try {
-      await saveMovie(this.state.data);
-    } catch (ex) {
-      if (ex.response && ex.response.status === 404)
-        toast.error("This movie is already been deleted.");
+    await saveMovie(this.state.data);
 
-      //this.setState({ movies: orginalMovies });
-    }
     this.props.history.push("/movies");
   };
 
