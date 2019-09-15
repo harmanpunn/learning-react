@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Route, Redirect, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import MetaTags from "react-meta-tags";
 import Movies from "./components/movies";
 import MovieForm from "./components/movieForm";
 import Customers from "./components/customers";
@@ -28,6 +29,9 @@ class App extends Component {
     return (
       <React.Fragment>
         <ToastContainer />
+        <MetaTags>
+          <title>Vidly App</title>
+        </MetaTags>
         <NavBar user={user} />
         <main className="container">
           <Switch>
