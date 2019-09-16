@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import MoviesTable from "./moviesTable";
 import Pagination from "./common/pagination";
 import ListGroup from "./common/listGroup";
+import LoadingSpinner from "./common/loadingSpinner";
 //import { getMovies } from "../services/fakeMovieService";
 //import { getGenres } from "../services/fakeGenreService";
 import { getMovies, deleteMovie } from "../services/movieService";
@@ -20,8 +21,13 @@ class Movies extends Component {
     pageSize: 4,
     searchQuery: "",
     selectedGenre: null,
-    sortColumn: { path: "title", order: "asc" }
+    sortColumn: { path: "title", order: "asc" },
+    loading: false
   };
+
+  componentWillMount() {
+    this.setState({ loading: true });
+  }
 
   async componentDidMount() {
     const { data: genresData } = await getGenres();
@@ -30,6 +36,7 @@ class Movies extends Component {
     const { data: movies } = await getMovies();
 
     this.setState({ movies, genres });
+    this.setState({ loading: false });
   }
 
   handleDelete = async movie => {
@@ -105,10 +112,16 @@ class Movies extends Component {
 
   render() {
     const { length: count } = this.state.movies;
-    const { pageSize, currentPage, sortColumn, searchQuery } = this.state;
+    const {
+      pageSize,
+      currentPage,
+      sortColumn,
+      searchQuery,
+      loading
+    } = this.state;
     const { user } = this.props;
 
-    if (count === 0) return <p>There are no movies in the database.</p>;
+    //if (count === 0) return <p>There are no movies in the database.</p>;
 
     const { totalCount, data: movies } = this.getPageData();
 
@@ -129,15 +142,21 @@ class Movies extends Component {
                 New Movie
               </Link>
             )}
-            <p>Showing {totalCount} movies in the database.</p>
-            <SearchBox value={searchQuery} onChange={this.handleSearch} />
-            <MoviesTable
-              movies={movies}
-              sortColumn={sortColumn}
-              onLike={this.handleLike}
-              onDelete={this.handleDelete}
-              onSort={this.handleSort}
-            />
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              <React.Fragment>
+                <p>Showing {totalCount} movies in the database.</p>
+                <SearchBox value={searchQuery} onChange={this.handleSearch} />
+                <MoviesTable
+                  movies={movies}
+                  sortColumn={sortColumn}
+                  onLike={this.handleLike}
+                  onDelete={this.handleDelete}
+                  onSort={this.handleSort}
+                />
+              </React.Fragment>
+            )}
             <Pagination
               itemsCount={totalCount}
               pageSize={pageSize}
